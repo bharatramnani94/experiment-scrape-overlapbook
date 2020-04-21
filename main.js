@@ -13,12 +13,12 @@ const openBrowser = async() => {
   return browser;
 }
 
-const scrapeChapters = async (browser) => {
-  const page = await browser.newPage();
-  await page.goto(DATA.urlOfIndexPage);
-  await page.waitFor(1000);
+const scrapeChapters = async (url, page) => {
+  await page.goto(url);
   const result = await page.evaluate(() => {
-    const chapters = [...document.querySelectorAll('.post-article ul ul li a')].map(anchorTag => {
+    const chapters = [
+      ...document.querySelectorAll(".post-article ul ul li a"),
+    ].map((anchorTag) => {
       const title = anchorTag.innerText;
       const url = anchorTag.href;
       return { title, url };
@@ -26,13 +26,30 @@ const scrapeChapters = async (browser) => {
     return chapters;
   });
   return result;
+};
+
+const scrapeChapter = async (url, page) => {
+  await page.goto(url);
+  const result = await page.evaluate(() => {
+    const htmlContent = document.querySelector(".booksection").innerHTML;
+    return htmlContent;
+  });
+  return result;
 }
 
 const scrapeEverything = async () => {
   const browser = await openBrowser();
-  const chapters = await scrapeChapters(browser);
+  const page = await browser.newPage();
+  const chapters = await scrapeChapters(DATA.urlOfIndexPage, page);
+  const finalResult = [];
+  for (const chapter of chapters) {
+    const url = chapter.url;
+    const title = chapter.title;
+    const content = await scrapeChapter(chapter.url, page);
+    finalResult.push({ title, url, content });
+  }
   browser.close();
-  return chapters;
+  return finalResult;
 };
 
 (async() => {
