@@ -20,9 +20,11 @@ Coding-Related:
 
 - 🔨Refactor the code to multiple files/modules instead of a single _main.js_
 
+- Add titles to each detail page
+
 Non-Coding-Related:
 
-- ~~🎦 Add a GIF or video that shows this in action.~~
+- ~~🎦 Add a GIF or video that shows this in action.~~ Create an updated GIF/Video
 
 - ℹ️ Add copyrights and disclaimer and originally appeared url to each page and to index page
 
