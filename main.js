@@ -4,11 +4,13 @@ const fs = require("fs");
 
 const CONFIG = {
   useHeadlessBrowser: true,
-  resultFolderPath: "./scraped/"
+  resultFolderPath: "./scraped/",
+  pageTimeoutInMs: 60 * 1000,
 }
 
 const DATA = {
   urlOfIndexPage: "https://seanwes.com/overlapbook/",
+  titleOfIndexPage: "Overlapbook"
 }
 
 const generateFilename = (str) => {
@@ -31,6 +33,24 @@ const writeFile = async (filename, fileContent) => {
     if (err) { throw err; }
     return;
   });
+}
+
+const getIndexChapterContent = (title, chapters) => {
+  return `
+    <h1>${title}</h1>
+    <ul>
+      ${
+        chapters.map(chapter => {
+          const { title, fileName } = chapter;
+          return `
+            <li>
+              <a href="${fileName}">${title}</a>
+            </li>
+          `
+        }).join('\n')
+      }
+    </ul>
+  `;
 }
 
 const openBrowser = async() => {
@@ -65,6 +85,7 @@ const scrapeChapter = async (url, page) => {
 const scrapeEverything = async () => {
   const browser = await openBrowser();
   const page = await browser.newPage();
+  await page.setDefaultNavigationTimeout(CONFIG.pageTimeoutInMs); // To allow enough time so that it does not times-out
   const chapters = await scrapeChapters(DATA.urlOfIndexPage, page);
   const indexAsAChapter = {
     url: "index",
@@ -72,25 +93,37 @@ const scrapeEverything = async () => {
     content: chapters,
   }
   const finalResult = [indexAsAChapter];
-  for (const chapter of chapters) {
+  for (const chapter of chapters.slice(0,2)) {
     const url = chapter.url;
     const title = chapter.title;
     const content = await scrapeChapter(chapter.url, page);
     finalResult.push({ title, url, content });
+    console.log("✅ Fetching chapter complete: " + title);
   }
   browser.close();
   return finalResult;
 };
 
 (async() => {
+  console.log("✅ Start!");
   const result = await scrapeEverything();
-  console.log("✅Fetching things complete.");
+  console.log("✅ Fetching all chapters complete.");
   createResultFolder(CONFIG.resultFolderPath);
-  for (const singleResult of result) {
-    const { title, content } = singleResult;
-    const fileName = generateFilename(title);
-    const filePath = CONFIG.resultFolderPath + fileName + ".html";
+  const beautifiedResult = result.map(singleResult => {
+    const { title } = singleResult;
+    const fileName = generateFilename(title) + ".html";
+    const filePath = CONFIG.resultFolderPath + fileName;
+    return { ...singleResult, fileName, filePath };
+  });
+  const [indexChapter, ...restOfTheChapters] = beautifiedResult;
+  const indexContent = getIndexChapterContent(DATA.titleOfIndexPage, restOfTheChapters);
+  await writeFile(indexChapter.filePath, indexContent);
+  console.log("✅ Written successfully: " + indexChapter.filePath);
+  for (const singleResult of restOfTheChapters) {
+    const { content, filePath } = singleResult;
     await writeFile(filePath, content);
     console.log("✅ Written successfully: " + filePath);
   }
+  console.log("✅ Success!");
+  console.log("✅ End!");
 })();
