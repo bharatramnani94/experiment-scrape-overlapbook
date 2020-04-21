@@ -93,7 +93,7 @@ const scrapeEverything = async () => {
     content: chapters,
   }
   const finalResult = [indexAsAChapter];
-  for (const chapter of chapters.slice(0,2)) {
+  for (const chapter of chapters) {
     const url = chapter.url;
     const title = chapter.title;
     const content = await scrapeChapter(chapter.url, page);
