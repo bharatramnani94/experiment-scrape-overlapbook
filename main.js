@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const puppeteer = require("slugify");
+const slugify = require("slugify");
 const fs = require("fs");
 
 const CONFIG = {
@@ -20,8 +20,14 @@ const generateFilename = (str) => {
   return slugify(str, options);
 }
 
+const createResultFolder = (folderName) => {
+  if (!fs.existsSync(folderName)) {
+    fs.mkdirSync(folderName);
+  }
+}
+
 const writeFile = async (filename, fileContent) => {
-  fs.writeFile(CONFIG.resultFolderPath + filename, fileContent, err => {
+  fs.writeFile(filename, fileContent, { flag: 'w+' }, err => {
     if (err) { throw err; }
     return;
   });
@@ -60,7 +66,12 @@ const scrapeEverything = async () => {
   const browser = await openBrowser();
   const page = await browser.newPage();
   const chapters = await scrapeChapters(DATA.urlOfIndexPage, page);
-  const finalResult = [];
+  const indexAsAChapter = {
+    url: "index",
+    title: "index",
+    content: chapters,
+  }
+  const finalResult = [indexAsAChapter];
   for (const chapter of chapters) {
     const url = chapter.url;
     const title = chapter.title;
@@ -73,5 +84,13 @@ const scrapeEverything = async () => {
 
 (async() => {
   const result = await scrapeEverything();
-  console.log(result);
+  console.log("✅Fetching things complete.");
+  createResultFolder(CONFIG.resultFolderPath);
+  for (const singleResult of result) {
+    const { title, content } = singleResult;
+    const fileName = generateFilename(title);
+    const filePath = CONFIG.resultFolderPath + fileName + ".html";
+    await writeFile(filePath, content);
+    console.log("✅ Written successfully: " + filePath);
+  }
 })();
