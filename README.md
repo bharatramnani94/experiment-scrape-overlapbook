@@ -3,6 +3,11 @@
 A simple NodeJS app which goes to https://seanwes.com/overlapbook/, gets the chapters list, opens them one at a time (sequentially), gets the HTML content for each of them, and them saves all that to an output folder.
 An index (index.html) is also created to navigate the chapters easily locally in the generated output folder.
 
+## Running
+
+- `npm install`
+- `node main.js`
+
 ## Improvements that could be implemented (Known):
 
 Coding-Related:
