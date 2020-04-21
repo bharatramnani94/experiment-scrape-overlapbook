@@ -28,6 +28,22 @@ const createResultFolder = (folderName) => {
   }
 }
 
+const wrapContentInHtml = (content) => {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+    </head>
+    <body>
+      ${content}
+    </body>
+    </html>
+  `;
+}
+
 const writeFile = async (filename, fileContent) => {
   fs.writeFile(filename, fileContent, { flag: 'w+' }, err => {
     if (err) { throw err; }
@@ -117,11 +133,11 @@ const scrapeEverything = async () => {
   });
   const [indexChapter, ...restOfTheChapters] = beautifiedResult;
   const indexContent = getIndexChapterContent(DATA.titleOfIndexPage, restOfTheChapters);
-  await writeFile(indexChapter.filePath, indexContent);
+  await writeFile(indexChapter.filePath, wrapContentInHtml(indexContent));
   console.log("✅ Written successfully: " + indexChapter.filePath);
   for (const singleResult of restOfTheChapters) {
     const { content, filePath } = singleResult;
-    await writeFile(filePath, content);
+    await writeFile(filePath, wrapContentInHtml(content));
     console.log("✅ Written successfully: " + filePath);
   }
   console.log("✅ Success!");
