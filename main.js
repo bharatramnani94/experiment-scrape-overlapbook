@@ -1,11 +1,30 @@
 const puppeteer = require('puppeteer');
+const puppeteer = require("slugify");
+const fs = require("fs");
 
 const CONFIG = {
   useHeadlessBrowser: true,
+  resultFolderPath: "./scraped/"
 }
 
 const DATA = {
   urlOfIndexPage: "https://seanwes.com/overlapbook/",
+}
+
+const generateFilename = (str) => {
+  const options = {
+    replacement: "-", // replace spaces with replacement character, defaults to `-`
+    lower: true, // convert to lower case, defaults to `false`
+    strict: true, // strip special characters except replacement, defaults to `false`
+  };
+  return slugify(str, options);
+}
+
+const writeFile = async (filename, fileContent) => {
+  fs.writeFile(CONFIG.resultFolderPath + filename, fileContent, err => {
+    if (err) { throw err; }
+    return;
+  });
 }
 
 const openBrowser = async() => {
