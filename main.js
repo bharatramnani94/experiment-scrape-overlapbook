@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer');
+// const puppeteer = require('puppeteer');
 
 let scrape = async () => {
   // Actual Scraping goes Here...
@@ -8,5 +8,7 @@ let scrape = async () => {
   // Return a value
 };
 
-const result = await scrape();
-console.log(result);
+(async() => {
+  const result = await scrape();
+  console.log(result);
+})();
