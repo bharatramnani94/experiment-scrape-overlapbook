@@ -16,13 +16,13 @@ Coding-Related:
 
 - ⛓️ Scrape each chapter parallelly - This is consciously kept to scrape-one-page-at-a-time right now so as to to minimize the load on the browser (to prevent opening multiple pages in parallel), and since the list of chapters is small anyway (27 at the time of writing). But of course, improvements are clearly possible here.
 
-- 💅 Make things pretty - Improve CSS for the index page as well as other pages
+- ~~💅 Make things pretty - Improve CSS for the index page as well as other pages~~
 
 - 🔨Refactor the code to multiple files/modules instead of a single _main.js_
 
 Non-Coding-Related:
 
-- 🎦 Add a GIF or video that shows this in action.
+- ~~🎦 Add a GIF or video that shows this in action.~~
 
 - ℹ️ Add copyrights and disclaimer and originally appeared url to each page and to index page
 
